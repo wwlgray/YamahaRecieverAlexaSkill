@@ -3,7 +3,7 @@
 var https = require('http');
 //var request = require("request-promise");
 //TODO 
-var uri = "184.6.255.4"; // the external IP including port number - remember you will need to port forward to your directv receiver's port 8080
+var uri = "[your static ip]"; // the external IP including port number - remember you will need to port forward to your directv receiver's port 8080
 
 //$CMD_SetZoneAOn = '<YAMAHA_AV cmd="PUT"><Main_Zone><Speaker_Preout><Speaker_AB><Speaker_A> On</Speaker_A></Speaker_AB></Speaker_Preout></Main_Zone></YAMAHA_AV>';
 //$CMD_SetZoneAOff = '<YAMAHA_AV cmd="PUT"><Main_Zone><Speaker_Preout><Speaker_AB><Speaker_A> Off</Speaker_A></Speaker_AB></Speaker_Preout></Main_Zone></YAMAHA_AV>';
@@ -122,7 +122,7 @@ exports.handler = (event, context) => {
                     //console.log(command);
                     var post_options = {
                         hostname: uri,
-                        port: '9981',
+                        port: '[your port]',
                         path: '/YamahaRemoteControl/ctrl',
                         method: 'POST',
                         headers: {
