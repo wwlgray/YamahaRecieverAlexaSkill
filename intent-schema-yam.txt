@@ -1,0 +1,22 @@
+﻿{
+  "intents": [
+    {
+      "intent": "GetCommand",
+      "slots":[
+        {
+          "name": "command",
+          "type": "COMMAND"
+        }
+      ]
+    },
+    {
+      "intent":"GetRecieverCommands",
+      "slots":[
+        {
+          "name": "CommandDescription",
+          "type": "COMMAND"
+        }
+      ]
+    }
+  ]
+}

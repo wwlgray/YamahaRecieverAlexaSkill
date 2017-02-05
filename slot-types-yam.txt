@@ -1,0 +1,9 @@
+﻿SLOT TYPE: COMMAND
+
+volume up
+volume down
+volume up large
+volume down large
+mute
+mute off
+list commands
