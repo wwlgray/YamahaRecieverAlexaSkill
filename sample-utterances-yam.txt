@@ -1,1 +1,2 @@
 ﻿GetCommand {command}
+ GetCommand set {command} to {dspName}
