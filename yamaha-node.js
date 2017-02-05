@@ -1,9 +1,9 @@
-﻿
+
 
 var https = require('http');
 //var request = require("request-promise");
 //TODO 
-var uri = "[your static ip]"; // the external IP including port number - remember you will need to port forward to your directv receiver's port 8080
+var uri = "184.6.255.4"; // the external IP including port number - remember you will need to port forward to your directv receiver's port 8080
 
 //$CMD_SetZoneAOn = '<YAMAHA_AV cmd="PUT"><Main_Zone><Speaker_Preout><Speaker_AB><Speaker_A> On</Speaker_A></Speaker_AB></Speaker_Preout></Main_Zone></YAMAHA_AV>';
 //$CMD_SetZoneAOff = '<YAMAHA_AV cmd="PUT"><Main_Zone><Speaker_Preout><Speaker_AB><Speaker_A> Off</Speaker_A></Speaker_AB></Speaker_Preout></Main_Zone></YAMAHA_AV>';
@@ -28,16 +28,17 @@ var uri = "[your static ip]"; // the external IP including port number - remembe
 //$CMD_SetPowerStandby = '<YAMAHA_AV cmd="PUT"><Main_Zone><Power_Control><Power>Standby</Power></Power_Control></Main_Zone></YAMAHA_AV>';
 
 //EVERYTHING BELOW THIS LINE NEEDS NO CHANGES TO WORK
-var assemble = "";
+var DSPName = "";
 var endpoint = "";
 var channel = "";
 var command = "";
 var path = "";
 var post_data = '';
 var commandMessage = '';
+
 exports.handler = (event, context) => {
     try {
-        assemble = "";
+        DSPName = "";
         endpoint = "";
         channel = "";
         command = "";
@@ -53,7 +54,7 @@ exports.handler = (event, context) => {
                 context.succeed(generateResponse(buildSpeechletResponse("Ask me to do something with your reciever", true), {}));
                 break;
             case "IntentRequest":
-                //if (event.request.intent.slots.zoneId) detectZone(event.request.intent.slots.zoneId.value);
+                if (event.request.intent.slots.dspName) detectDSP(event.request.intent.slots.dspName.value);
                 //if (event.request.intent.slots.ChannelNumber) channel = event.request.intent.slots.ChannelNumber.value;
                 if (event.request.intent.slots.command) command = event.request.intent.slots.command.value;
 
@@ -82,16 +83,7 @@ exports.handler = (event, context) => {
                                 console.log('down');
                                 post_data = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Lvl><Val>Down 1 dB</Val><Exp></Exp><Unit></Unit></Lvl></Volume></Main_Zone></YAMAHA_AV>';
                                 break;
-                            case "volume up large":
-                                commandMessage = 'I turned the volume up';
-                                console.log('up');
-                                post_data = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Lvl><Val>Up 15 dB</Val><Exp></Exp><Unit></Unit></Lvl></Volume></Main_Zone></YAMAHA_AV>';
-                                break;
-                            case "volume down large":
-                                commandMessage = 'I turned the volume down';
-                                console.log('down');
-                                post_data = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Lvl><Val>Down 15 dB</Val><Exp></Exp><Unit></Unit></Lvl></Volume></Main_Zone></YAMAHA_AV>';
-                                break;
+                           
                             case "mute":
                                 commandMessage = 'mute is on';
                                 post_data = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Mute>On</Mute></Volume></Main_Zone></YAMAHA_AV>';
@@ -100,16 +92,31 @@ exports.handler = (event, context) => {
                                 commandMessage = 'mute is off';
                                 post_data = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Mute>Off</Mute></Volume></Main_Zone></YAMAHA_AV>';
                                 break;
+                            case "surround":
+                                
+                                if (DSPName !== '') {
+                                    commandMessage = 'DSP is set to ' + DSPName;
+                                    post_data = '<YAMAHA_AV cmd="PUT"><Main_Zone><Surround><Program_Sel><Current><Sound_Program>' + DSPName + '</Sound_Program></Current></Program_Sel></Surround></Main_Zone></YAMAHA_AV>';
+                                } else {
+                                    commandMessage = "Sorry I didn't catch the surround setting";
+                                    post_data = '';
+                                }
+                                
+                                break;
+                               
                             case "list commands":
                                 commandMessage = 'You can say, mute, mute off, volume up, volume up small, volume up large, and the same for down.';
                                 break;
                             //$CMD_SetPowerOn = '<YAMAHA_AV cmd="PUT"><Main_Zone><Power_Control><Power>On</Power></Power_Control></Main_Zone></YAMAHA_AV>';
                             //$CMD_SetPowerStandby = '<YAMAHA_AV cmd="PUT"><Main_Zone><Power_Control><Power>Standby</Power></Power_Control></Main_Zone></YAMAHA_AV>';
                             //$CMD_SetScene = '<YAMAHA_AV cmd="PUT"><Main_Zone><Scene><Scene_Sel>Direct</Scene_Sel></Scene></Main_Zone></YAMAHA_AV>';
-                            //$CMD_SetScene = '<YAMAHA_AV cmd="PUT"><Main_Zone><Setup><Surround><Program_Sel><Sound_Program>Direct</Sound_Program></Program_Sel></Surround></Setup></Main_Zone></YAMAHA_AV>';
+                            //$CMD_SetScene = '<YAMAHA_AV cmd="PUT"><Main_Zone><Surround><Program_Sel><Sound_Program>Direct</Sound_Program></Program_Sel></Surround></Setup></Main_Zone></YAMAHA_AV>';
                             default:
                                 break;
                         }
+
+                        break;
+                    case "GetRecieverCommands":
 
                         break;
 
@@ -122,7 +129,7 @@ exports.handler = (event, context) => {
                     //console.log(command);
                     var post_options = {
                         hostname: uri,
-                        port: '[your port]',
+                        port: '9981',
                         path: '/YamahaRemoteControl/ctrl',
                         method: 'POST',
                         headers: {
@@ -191,3 +198,69 @@ generateResponse = (speechletResponse, sessionAttributes) => {
     };
 };
 
+detectDSP = function (dsp) {
+    switch (dsp) {
+        case "7 channel":
+            DSPName = "7ch Stereo";
+            break;
+        case "munich":
+            DSPName = "Hall in Munich";
+            break;
+        case "vienna":
+            DSPName = "Hall in Vienna";
+            break;
+        case "chamber":
+            DSPName = "Chamber";
+            break;
+        case "cellar club":
+            DSPName = "Cellar Club";
+            break;
+        case "roxy":
+            DSPName = "The Roxy Theatre";
+            break;
+        case "the bottom line":
+            DSPName = "The Bottom Line";
+            break;
+        case "sports":
+            DSPName = "Sports";
+            break;
+        case "action game":
+            DSPName = "Action Game";
+            break;
+        case "roleplaying":
+            DSPName = "Roleplaying Game";
+            break;
+        case "music video":
+            DSPName = "Music Video";
+            break;
+        case "standard":
+            DSPName = "Standard";
+            break;
+        case "spectacle":
+            DSPName = "Spectacle";
+            break;
+        case "sci-fi":
+            DSPName = "Sci-Fi";
+            break;
+        case "adventure":
+            DSPName = "Adventure";
+            break;
+        case "drama":
+            DSPName = "Drama";
+            break;
+        case "mono":
+            DSPName = "Mono Movie";
+            break;
+        case "surround decoder":
+            DSPName = "Surround Decoder";
+            break;
+        case "2 channel":
+            DSPName = "2ch Stereo";
+            break;
+        default:
+            DSPName = "";
+
+    }
+    return;
+    
+}
