@@ -1,4 +1,4 @@
-﻿SLOT TYPE: COMMAND
+SLOT TYPE: COMMAND
 
 volume up
 volume down
@@ -7,3 +7,24 @@ volume down large
 mute
 mute off
 list commands
+
+SLOT TYPE:DSP
+
+7 channel
+munich
+vienna
+chamber
+cellar club
+roxy
+the bottom line
+sports
+roleplaying
+music video
+standard
+spectacle
+sci-fi
+adventure
+drama
+mono
+surround decoder
+2 channel
